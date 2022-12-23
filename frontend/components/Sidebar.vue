@@ -32,6 +32,14 @@
                     </nuxt-link>
                 </li>
                 <li v-if="isAdmin" class="nav-item">
+                    <nuxt-link to="/sistema/responsablereservaciones" class="nav-link text-white">
+                        <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="fa fa-building"></i>
+                        </div>
+                        <span class="nav-link-text ms-1 fs-20">Reservacion</span>
+                    </nuxt-link>
+                </li>
+                <li v-if="isAdmin" class="nav-item">
                     <nuxt-link to="/sistema/local" class="nav-link text-white">
                         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                             <i class="fa fa-building"></i>
@@ -39,7 +47,15 @@
                         <span class="nav-link-text ms-1 fs-20">Locales</span>
                     </nuxt-link>
                 </li>
-                <li v-if="isAdmin " class="nav-item">
+                <li v-if="isAdmin" class="nav-item">
+                    <nuxt-link to="/sistema/solicitantelocales" class="nav-link text-white">
+                        <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
+                            <i class="fa fa-building"></i>
+                        </div>
+                        <span class="nav-link-text ms-1 fs-20">Locales</span>
+                    </nuxt-link>
+                </li>
+                <li v-if="isAdmin" class="nav-item">
                     <nuxt-link to="/sistema/responsablelocales" class="nav-link text-white">
                         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                             <i class="fa fa-city"></i>
@@ -107,7 +123,8 @@
     border-right-width: 0;
     border-bottom-width: 0;
     background-color: rgba(199, 199, 199, 0.2);
-    background-image: linear-gradient(195deg, #49a3f1 0%, #1A73E8 100%);;
+    background-image: linear-gradient(195deg, #49a3f1 0%, #1A73E8 100%);
+    ;
 }
 
 .navbar-vertical .navbar-nav>.nav-item .nav-link.nuxt-link-active>.nav-link.nuxt-link-exact-active.nuxt-link-active {
@@ -141,26 +158,26 @@ export default {
             },
             active: false,
 
-            
-            drpoDownLocales:[
-            //    {
-            //        label: 'Locales',
-            //        link:'/sistema/local',
-            //        icon:'fa-list-check',
-            //       active:false,
-            //    },
-            //     {
-            //         label: 'Mis Locales',
-            //         link:'/sistema/local',
-            //         icon:'fa-list-check',
-            //         active:false,
-            //     },
-            //     {
-            //         label: 'Tipo de Medios',
-            //         link:'/sistema/tipomedio',
-            //         icon:'fa-chart-line',
-            //         active:false,
-            //     }
+
+            drpoDownLocales: [
+                //    {
+                //        label: 'Locales',
+                //        link:'/sistema/local',
+                //        icon:'fa-list-check',
+                //       active:false,
+                //    },
+                //     {
+                //         label: 'Mis Locales',
+                //         link:'/sistema/local',
+                //         icon:'fa-list-check',
+                //         active:false,
+                //     },
+                //     {
+                //         label: 'Tipo de Medios',
+                //         link:'/sistema/tipomedio',
+                //         icon:'fa-chart-line',
+                //         active:false,
+                //     }
             ]
 
         }
