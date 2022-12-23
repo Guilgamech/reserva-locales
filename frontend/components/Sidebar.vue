@@ -74,7 +74,7 @@
                 <li v-if="isAdmin" class="nav-item">
                     <nuxt-link to="/sistema/aseguramiento" class="nav-link text-white">
                         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="fa fa-cart-plus"></i>
+                            <i class="fa fa-box-archive"></i>
 
                         </div>
                         <span class="nav-link-text ms-1 fs-20">Aseguramientos</span>
@@ -92,7 +92,7 @@
                 <li v-if="isAdmin" class="nav-item">
                     <nuxt-link to="/sistema/actividad" class="nav-link text-white">
                         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="fa fa-list-check"></i>
+                            <i class="fa fa-screwdriver-wrench"></i>
 
                         </div>
                         <span class="nav-link-text ms-1 fs-20">Actividades</span>
