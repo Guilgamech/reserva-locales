@@ -83,7 +83,7 @@
                 <li v-if="isAdmin" class="nav-item">
                     <nuxt-link to="/sistema/medio" class="nav-link text-white">
                         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="fa fa-dolly-flatbed"></i>
+                            <i class="fa fa-screwdriver-wrench"></i>
 
                         </div>
                         <span class="nav-link-text ms-1 fs-20">Medio</span>
@@ -92,7 +92,7 @@
                 <li v-if="isAdmin" class="nav-item">
                     <nuxt-link to="/sistema/actividad" class="nav-link text-white">
                         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
-                            <i class="fa fa-screwdriver-wrench"></i>
+                            <i class="fa fa-list-check"></i>
 
                         </div>
                         <span class="nav-link-text ms-1 fs-20">Actividades</span>
