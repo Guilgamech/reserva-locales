@@ -1,0 +1,6 @@
+clases
+<i class="fa-solid fa-person-chalkboard"></i>
+conferencias
+<i class="fa-regular fa-comments"></i>
+reunion
+<i class="fa-regular fa-handshake"></i>
