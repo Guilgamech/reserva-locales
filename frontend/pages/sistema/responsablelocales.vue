@@ -5,10 +5,6 @@
                 <div class="col-6 d-flex align-items-center">
                     <h6 class="text-white text-capitalize ps-3">Mis Locales del Sistema</h6>
                 </div>
-                <div class="col-6 text-end">
-                    <a role="button" @click="modal_agregar_medio = true" class="btn bg-gradient-success mb-0 cursor-pointer"><i
-                            class="fa-solid fa-plus me-2"></i>Agregar Medio</a>
-                </div>
             </div>
         </div>
         <div class="card-body px-0 pb-2">

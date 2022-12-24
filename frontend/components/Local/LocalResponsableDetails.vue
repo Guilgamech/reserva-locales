@@ -68,6 +68,13 @@
                                         </button>
                                     </div>
                                 </div>
+                                <div class="col-2">
+                                    <button
+                                    @click="modal_agregar_medio = true"
+                                    type="button" class="btn btn-success">
+                                        <i class="fa fa-plus"></i>
+                                    </button>
+                                </div>
                             </div>
                             <div class="row justify-content-center text-center mt-3">
                                 <div class="col-lg-4 cl-md-6 col-sm-6 col-12">
@@ -80,6 +87,8 @@
                 </div>
             </div>
         </div>
+        <MedioLocalesCreate :show="modal_agregar_medio" @creado="modal_agregar_medio = false" @ocultar="modal_agregar_medio = false" />
+
         <MedioLocalesEdit :data="data" :show="modal_edit" @editado="modal_edit = false" @ocultar="modal_edit = false" />
     </div>
 
@@ -104,6 +113,7 @@ export default {
         }
     },
     mounted() {
+        this.modal_agregar_medio = false,
         this.modal_edit = false,
             this.detail_id = '';
 
@@ -281,6 +291,7 @@ export default {
     },
     data() {
         return {
+            modal_agregar_medio: false,
             canedit: false,
             modal_edit: false,
             data: { local_id: '', medio_id: '' },

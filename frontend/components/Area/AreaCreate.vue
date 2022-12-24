@@ -136,9 +136,6 @@ export default {
         ocultar(){
             this.$store.dispatch('area/unset_error'); 
             this.$emit('ocultar')
-
-            this.area.nombre = '';
-            this.area.descripcion = '';
         },
         submit(){
             this.$store.dispatch('area/save', this.area);

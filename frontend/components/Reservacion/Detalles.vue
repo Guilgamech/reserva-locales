@@ -30,7 +30,7 @@
                         </button>
                     </div>
                 </div>
-                <div class="col-1">
+                <div class="col-2">
                     <button v-if="canDelete"
                     @click="$store.dispatch('reservacion/setAseguramientoModal', true)"
                     type="button" class="btn btn-success">

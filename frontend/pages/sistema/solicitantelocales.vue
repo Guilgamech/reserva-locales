@@ -80,7 +80,7 @@ import { PerfectScrollbar } from 'vue2-perfect-scrollbar'
 export default {
     components: { PerfectScrollbar, LocalDetails },
     name: 'LocalSolicitante',
-    middleware: ['solicitante'],
+    middleware: ['admin'],
     mounted() {
         this.modal_detail = false,
             this.detail_id = '';

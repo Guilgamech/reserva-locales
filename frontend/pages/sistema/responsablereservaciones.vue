@@ -324,7 +324,7 @@ export default {
 }
 
 .vuecal__title-bar {
-    background: linear-gradient(195deg, #49a3f1 0%, #1A73E8 100%);
+    background:linear-gradient(195deg, #42424a 0%, #191919 100%);
     color: white !important;
     ;
 }
@@ -365,7 +365,7 @@ export default {
 }
 
 .vuecal__event.pendiente {
-    background-color: #b4fdfd;
+    background-color: #49a3f1;
     color: #333;
 }
 
@@ -400,7 +400,7 @@ tr.aprobada td:last-child {
 }
 
 tr.pendiente {
-    background-color: #b4fdfd;
+    background-color: #49a3f1;
     border-radius: 5px;
 }
 
@@ -454,5 +454,11 @@ tr.cancelada td:last-child {
 
 .vuecal__cell-events-count {
     background-color: #5eb762;
+}
+
+.vuecal__title-bar button {
+
+    color: white;
+
 }
 </style>
