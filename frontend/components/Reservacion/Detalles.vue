@@ -2,24 +2,24 @@
     <div class="container-fluid">
         <div v-if="!!item" class="row">
             <div class="col-12">
-                <h5>Tipo de Actividad: <span class="text-sm text-secondary">{{ item.actividad.tipo_actividad.nombre }}</span></h5>
-                <h5>Actividad: <span class="text-sm text-secondary">{{ item.actividad.nombre }}</span></h5>
-                <h5>Cantidad de Participantes: <span class="text-sm text-secondary">{{ item.cantidad_participantes }}</span></h5>
-                <h5>Fecha: <span class="text-sm text-secondary">{{ fmDate(item.fecha_inicio) }}</span></h5>
-                <h5>Horario: <span class="text-sm text-secondary">{{ hDate(item.fecha_inicio) }} - {{ hDate(item.fecha_fin) }}</span></h5>
-                <h5>Estado: <span class="text-sm text-secondary">{{ item.estado }}</span></h5>
-                <h5>Solicitante: <span class="text-sm text-secondary">{{ item.solicitante.email }}</span></h5>
-                <h5 v-if="item.estado === 'Cancelada'">Motivo Cancelación: <span class="text-sm text-secondary">{{ item.motivo }}</span></h5>
+                <h6>Tipo de Actividad: <span class="text-sm text-secondary">{{ item.actividad.tipo_actividad.nombre }}</span></h6>
+                <h6>Actividad: <span class="text-sm text-secondary">{{ item.actividad.nombre }}</span></h6>
+                <h6>Cantidad de Participantes: <span class="text-sm text-secondary">{{ item.cantidad_participantes }}</span></h6>
+                <h6>Fecha: <span class="text-sm text-secondary">{{ fmDate(item.fecha_inicio) }}</span></h6>
+                <h6>Horario: <span class="text-sm text-secondary">{{ hDate(item.fecha_inicio) }} - {{ hDate(item.fecha_fin) }}</span></h6>
+                <h6>Estado: <span class="text-sm text-secondary">{{ item.estado }}</span></h6>
+                <h6>Solicitante: <span class="text-sm text-secondary">{{ item.solicitante.email }}</span></h6>
+                <h6 v-if="item.estado === 'Cancelada'">Motivo Cancelación: <span class="text-sm text-secondary">{{ item.motivo }}</span></h6>
                 <div class="row " v-if="item.estado === 'Aprobada'">
                     <div class="row col-12 mb-3 ">
-                        <h5 class="col-12">Aseguramientos:
-                        </h5>
+                        <h6 class="col-12">Aseguramientos:
+                        </h6>
                     </div>
                     <div class="row col-12 mb-3" v-for=" (itemAseguramiento, index) in item.aseguramientos ">
-                        <h5 class="col-6"><span class="text-sm text-secondary">{{ itemAseguramiento.aseguramiento.nombre }}</span>
-                        </h5>
-                        <h5 class="col-3"><span class="text-sm text-secondary">{{ itemAseguramiento.cantidad }}</span>
-                        </h5>
+                        <h6 class="col-6"><span class="text-sm text-secondary">{{ itemAseguramiento.aseguramiento.nombre }}</span>
+                        </h6>
+                        <h6 class="col-3"><span class="text-sm text-secondary">{{ itemAseguramiento.cantidad }}</span>
+                        </h6>
                         <button v-if="canDelete" v-tooltip="'Eliminar Aseguramiento'" type="button"
                             class="md-button md-danger md-just-icon col-1 ms-2">
                             <div class="md-ripple">

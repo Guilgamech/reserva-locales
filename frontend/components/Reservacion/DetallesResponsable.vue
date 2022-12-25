@@ -2,14 +2,15 @@
     <div class="container-fluid">
         <div v-if="!!item" class="row">
             <div class="col-12">
-                <h5>Tipo de Actividad: {{ item.actividad.tipo_actividad.nombre }}</h5>
-                <h5>Actividad: {{ item.actividad.nombre }}</h5>
-                <h5>Cantidad de Participantes: {{ item.cantidad_participantes }}</h5>
-                <h5>Fecha: {{ fmDate(item.fecha_inicio) }}</h5>
-                <h5>Horario: {{ hDate(item.fecha_inicio) }} - {{ hDate(item.fecha_fin) }}</h5>
-                <h5>Estado: {{ item.estado }}</h5>
-                <h5 v-if="item.estado === 'Cancelada'">Motivo Cancelación: {{ item.motivo }}</h5>
-                <h5 v-if="item.estado === 'Aprobada'">Aseguramientos: {{ item.aseguramientos }}</h5>
+                <h6>Tipo de Actividad: <span class="text-sm text-secondary">{{ item.actividad.tipo_actividad.nombre }}</span></h6>
+                <h6>Actividad: <span class="text-sm text-secondary">{{ item.actividad.nombre }}</span></h6>
+                <h6>Cantidad de Participantes: <span class="text-sm text-secondary">{{ item.cantidad_participantes }}</span></h6>
+                <h6>Fecha: <span class="text-sm text-secondary">{{ fmDate(item.fecha_inicio) }}</span></h6>
+                <h6>Horario: <span class="text-sm text-secondary">{{ hDate(item.fecha_inicio) }} - {{ hDate(item.fecha_fin) }}</span></h6>
+                <h6>Estado: <span class="text-sm text-secondary">{{ item.estado }}</span></h6>
+                <h6>Solicitante: <span class="text-sm text-secondary">{{ item.solicitante.email }}</span></h6>
+                <h6 v-if="item.estado === 'Cancelada'">Motivo Cancelación: <span class="text-sm text-secondary">{{ item.motivo }}</span></h6>
+                <h6 v-if="item.estado === 'Aprobada'">Aseguramientos: <span class="text-sm text-secondary">{{ item.aseguramientos }}</span></h6>
             </div>
             <div class="col-12 mt-2">
                 <div class="row">
