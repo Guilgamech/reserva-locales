@@ -2,23 +2,23 @@
     <div class="container-fluid">
         <div v-if="!!item" class="row">
             <div class="col-12">
-                <h5>Tipo de Actividad: {{ item.actividad.tipo_actividad.nombre }}</h5>
-                <h5>Actividad: {{ item.actividad.nombre }}</h5>
-                <h5>Cantidad de Participantes: {{ item.cantidad_participantes }}</h5>
-                <h5>Fecha: {{ fmDate(item.fecha_inicio) }}</h5>
-                <h5>Horario: {{ hDate(item.fecha_inicio) }} - {{ hDate(item.fecha_fin) }}</h5>
-                <h5>Estado: {{ item.estado }}</h5>
-                <h5>Solicitante: {{ item.solicitante.email }}</h5>
-                <h5 v-if="item.estado === 'Cancelada'">Motivo Cancelación: {{ item.motivo }}</h5>
+                <h5>Tipo de Actividad: <span class="text-sm text-secondary">{{ item.actividad.tipo_actividad.nombre }}</span></h5>
+                <h5>Actividad: <span class="text-sm text-secondary">{{ item.actividad.nombre }}</span></h5>
+                <h5>Cantidad de Participantes: <span class="text-sm text-secondary">{{ item.cantidad_participantes }}</span></h5>
+                <h5>Fecha: <span class="text-sm text-secondary">{{ fmDate(item.fecha_inicio) }}</span></h5>
+                <h5>Horario: <span class="text-sm text-secondary">{{ hDate(item.fecha_inicio) }} - {{ hDate(item.fecha_fin) }}</span></h5>
+                <h5>Estado: <span class="text-sm text-secondary">{{ item.estado }}</span></h5>
+                <h5>Solicitante: <span class="text-sm text-secondary">{{ item.solicitante.email }}</span></h5>
+                <h5 v-if="item.estado === 'Cancelada'">Motivo Cancelación: <span class="text-sm text-secondary">{{ item.motivo }}</span></h5>
                 <div class="row " v-if="item.estado === 'Aprobada'">
                     <div class="row col-12 mb-3 ">
                         <h5 class="col-12">Aseguramientos:
                         </h5>
                     </div>
                     <div class="row col-12 mb-3" v-for=" (itemAseguramiento, index) in item.aseguramientos ">
-                        <h5 class="col-6">{{ itemAseguramiento.aseguramiento.nombre }}
+                        <h5 class="col-6"><span class="text-sm text-secondary">{{ itemAseguramiento.aseguramiento.nombre }}</span>
                         </h5>
-                        <h5 class="col-3">{{ itemAseguramiento.cantidad }}
+                        <h5 class="col-3"><span class="text-sm text-secondary">{{ itemAseguramiento.cantidad }}</span>
                         </h5>
                         <button v-if="canDelete" v-tooltip="'Eliminar Aseguramiento'" type="button"
                             class="md-button md-danger md-just-icon col-1 ms-2">
@@ -31,7 +31,7 @@
                     </div>
                 </div>
                 <div class="col-2">
-                    <button v-if="canDelete"
+                    <button v-if="canDelete && item.estado === 'Aprobada'"
                     @click="$store.dispatch('reservacion/setAseguramientoModal', true)"
                     type="button" class="btn btn-success">
                         <i class="fa fa-plus"></i>
