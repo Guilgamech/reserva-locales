@@ -15,13 +15,13 @@
                         <h6 class="col-12">Aseguramientos:
                         </h6>
                     </div>
-                    <div class="row col-12 mb-3" v-for=" (itemAseguramiento, index) in item.aseguramientos ">
+                    <div class="row col-12 mb-3" v-for=" (itemAseguramiento, index) in item.aseguramientos " :key="`ia-${index}`">
                         <h6 class="col-6"><span class="text-sm text-secondary">{{ itemAseguramiento.aseguramiento.nombre }}</span>
                         </h6>
                         <h6 class="col-3"><span class="text-sm text-secondary">{{ itemAseguramiento.cantidad }}</span>
                         </h6>
                         <button v-if="canDelete" v-tooltip="'Eliminar Aseguramiento'" type="button"
-                            class="md-button md-danger md-just-icon col-1 ms-2">
+                            class="md-button md-danger md-just-icon col-1 ms-2" @click="sendDelete(itemAseguramiento.id)">
                             <div class="md-ripple">
                                 <div class="md-button-content">
                                     <i class="fas fa-trash-alt"></i>
@@ -116,9 +116,37 @@ export default {
             const fecha = utcToZonedTime(date, 'Cuba')
             return formatDate(fecha, "HH:mm");
         },
-        sendDelete() {
-            this.$store.dispatch('reservacion/deleteItem', this.item?.id)
-            console.log('send Delete')
+        async sendDelete(id) {
+            await swal({
+                title: "Estas Seguro de Eliminarlo",
+                icon: "error",
+                buttons: ["Salir", "Sí, Elimínalo"],
+                dangerMode: true
+            }).then(async (willCancel) => {
+                if (willCancel) {
+                    await this.$axios.$delete(`/reservacion-aseguramiento/${id}/`)
+                        .then(()=>{
+                            swal({
+                                title: "Correcto!!",
+                                text: "Eliminado Satisfactoriamente",
+                                icon: "success",
+                                button: "Continuar",
+                            }).then(() => {
+                                this.$store.dispatch("reservacion/getItem", this.item.id)
+                            })
+                        })
+                        .catch(()=>{
+                            swal({
+                                title: "ERROR !!",
+                                text: "Revise la conexión con la Api",
+                                icon: "error",
+                                button: "Continuar",
+                            })
+                        })
+                } else {
+                    swal("Ha Cancelado de la Acción de Eliminar")
+                }
+            });
         }
     },
     mounted() {

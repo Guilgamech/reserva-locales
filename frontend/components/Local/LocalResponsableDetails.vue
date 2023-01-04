@@ -87,7 +87,7 @@
                 </div>
             </div>
         </div>
-        <MedioLocalesCreate :show="modal_agregar_medio" @creado="modal_agregar_medio = false" @ocultar="modal_agregar_medio = false" />
+        <MedioLocalesCreate :currentlocal="edit" :show="modal_agregar_medio" @creado="modal_agregar_medio = false" @ocultar="modal_agregar_medio = false" />
 
         <MedioLocalesEdit :data="data" :show="modal_edit" @editado="modal_edit = false" @ocultar="modal_edit = false" />
     </div>
@@ -98,9 +98,9 @@
 import swal from 'sweetalert';
 import Inputoutline from '../Inputoutline.vue'
 import MedioLocalesEdit from '../../components/MedioLocales/MedioLocalesEdit.vue';
-
+import MedioLocalesCreate from '../MedioLocales/MedioLocalesCreate';
 export default {
-    components: { Inputoutline, MedioLocalesEdit },
+    components: { Inputoutline, MedioLocalesEdit, MedioLocalesCreate },
     name: 'LocalResponsableDetails',
     props: {
         show: {
@@ -307,5 +307,5 @@ export default {
     },
 
 
-}   
+}
 </script>

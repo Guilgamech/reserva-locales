@@ -302,8 +302,7 @@ export default {
     }),
     methods: {
         async actividadCreada() {
-            const newId = this.setActividadCreada = this.$store.state.actividad.creado_id;
-            console.log({newId, actividades: this.actividades})
+            const newId = this.$store.state.actividad.creado_id;
             await this.$store.dispatch("actividad/listado");
             const foundActivity = this.actividades.filter(el => el.id === newId)
             if (foundActivity.length > 0) {

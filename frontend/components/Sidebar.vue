@@ -32,7 +32,7 @@
                     </nuxt-link>
                 </li>
                 <li v-if="isAdmin" class="nav-item">
-                    <nuxt-link to="/sistema/responsablereservaciones" class="nav-link text-white">
+                    <nuxt-link to="/sistema/responsable-reservaciones" class="nav-link text-white">
                         <div class="text-white text-center me-2 d-flex align-items-center justify-content-center">
                             <i class="fa fa-building"></i>
                         </div>

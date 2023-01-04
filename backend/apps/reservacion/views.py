@@ -46,9 +46,9 @@ class ReservacionView(NestedViewSetMixin):
                         return True
                     if checkDateInRange(element.fecha_fin, newStart, newEnd):
                         return True
-                    if checkDateInRange(newStart, element.fecha_inicio, element.fecha_inicio):
+                    if checkDateInRange(newStart, element.fecha_inicio, element.fecha_fin):
                         return True
-                    if checkDateInRange(newEnd, element.fecha_inicio, element.fecha_inicio):
+                    if checkDateInRange(newEnd, element.fecha_inicio, element.fecha_fin):
                         return True
                     return False
 
@@ -63,17 +63,43 @@ class ReservacionView(NestedViewSetMixin):
         estado = request.data.get("estado")
         motivo = request.data.get("motivo")
         local_id = request.data.get("local")
-        if local_id is not None and estado is not None and estado == "Aprobada" and motivo == "":
+        if local_id is not None and estado is not None and estado == "Aprobada":
             local = Local.objects.filter(pk=local_id).first()
             if local is None:
                 raise ValidationError(
                     {"local": [f"Local con id:{local_id} no esta en la base de datos"]})
             if local.responsable_email != user.email:
                 raise PermissionDenied()
+            reservacion = self.get_object()
+            reservaciones_aprobadas = list(
+                Reservacion.objects.filter(estado="Aprobada"))
+            print(reservaciones_aprobadas)
+            print(reservacion)
+            if len(reservaciones_aprobadas) > 0:
+                newStart = reservacion.fecha_inicio + timedelta(seconds=1)
+                print(newStart)
+                newEnd = reservacion.fecha_fin - timedelta(seconds=1)
+                print(newEnd)
+
+                def foundDateInRange(element: Reservacion):
+                    if checkDateInRange(element.fecha_inicio, newStart, newEnd):
+                        return True
+                    if checkDateInRange(element.fecha_fin, newStart, newEnd):
+                        return True
+                    if checkDateInRange(newStart, element.fecha_inicio, element.fecha_fin):
+                        return True
+                    if checkDateInRange(newEnd, element.fecha_inicio, element.fecha_fin):
+                        return True
+                    return False
+
+                found = list(filter(foundDateInRange, reservaciones_aprobadas))
+                print(found)
+                if len(found) > 0:
+                    raise ValidationError(
+                        {"fecha_inico": ["ya tiene una reservación en esa fecha"]})
         return super().update(request, *args, **kwargs)
 
     @action(detail=False, methods=["get"])
-
     def responsables(self, request):
         user = self.request.user
         reservaciones = Reservacion.objects.filter(
@@ -153,11 +179,3 @@ class ReservacionAseguramientoView(viewsets.GenericViewSet, mixins.CreateModelMi
             if reservacion is not None and self.request.user.id != reservacion.solicitante_id:
                 raise PermissionDenied()
         return super().update(request, *args, **kwargs)
-
-    def destroy(self, request, *args, **kwargs):
-        if request.data["reservacion"] is not None:
-            reservacion_id = request.data["reservacion"]
-            reservacion = Reservacion.objects.filter(pk=reservacion_id).first()
-            if reservacion is not None and self.request.user.id != reservacion.solicitante_id:
-                raise PermissionDenied()
-        return super().destroy(request, *args, **kwargs)

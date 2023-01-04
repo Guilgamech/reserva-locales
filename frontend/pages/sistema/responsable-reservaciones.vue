@@ -40,7 +40,7 @@
                                 </div>
                                 <input type="text" v-model="filter" placeholder="Filtro:" />
                             </div>
-                            <h6 v-if="events.length === 0" class="text-center">No tiene actividades</h6>
+                            <h6 v-if="tableContent.length === 0" class="text-center">No tiene actividades</h6>
 
                             <perfect-scrollbar key="table-reservation" v-else class="table-responsive py-0 px-2 mh-350">
                                 <table class="table align-items-center mb-0">
@@ -74,7 +74,7 @@
                                                     <a @click="changeSelectDate(item.fecha)"
                                                         class="text-dark text-sm font-weight-bolder cursor-pointer"><i
                                                             class="fa fa-file-invoice text-dark"></i></a>
-                                                    <a @click="changeSelectDate(item.fecha)"
+                                                    <a @click="changeSelectItem(item)"
                                                         class="text-dark text-sm font-weight-bolder cursor-pointer"><i
                                                             class="fa fa-search text-dark ms-3"></i></a>
                                                 </div>
@@ -93,7 +93,7 @@
                 <div class="card-body">
                     <vue-cal ref="vuecal" :selected-date="selectDay" :disable-views="['years', 'year']" :events="events"
                         :locale="es" :hide-weekdays="[7]" :time="true" :time-cell-height="60" :time-from="8 * 60"
-                        :time-step="90" :time-to="23 * 60" cell-contextmenu 
+                        :time-step="90" :time-to="23 * 60" cell-contextmenu
                         :on-event-click="enventClick">
                         <template v-tooltip="event.title_tooltip" #event="{ event, view }">
                             <div class="vuecal__event-title cursor-pointer" v-html="event.title" />
@@ -103,7 +103,9 @@
             </div>
         </div>
         <Modal modal-id="cliente-reservacion-detail" size="sm" title="Detalle Reservación">
-            <Detalles @ocultar_detalles="hideNewEvent" @reservacion_eliminada="refreshReservations" />
+            <Detalles @ocultar_detalles="hideNewEvent"
+                @reservacion-cancelada="refreshReservations"
+                @reservacion-aprobada="refreshReservations"/>
         </Modal>
 
     </div>
@@ -172,12 +174,49 @@ export default {
         },
         localesReservaciones() {
             if (this.localresponsableSelected !== null) {
-                const storeLocals = this.$store.state.localresponsable.listado;
+                const storeLocals = this.locales;
                 return storeLocals.filter(el => el.id === this.localresponsableSelected.id)[0].reservaciones;
             }
             return []
 
 
+        },
+        restReservations(){
+            const allReservations = this.localesReservaciones;
+            const reservations = allReservations.filter(element => element.estado !== "Aprobada")
+            let newReservations = reservations.map(el => {
+                let newEl = {}
+                const content = { ...el }
+                const start = utcToZonedTime(content.fecha_inicio, 'Cuba')
+                const end = utcToZonedTime(content.fecha_fin, 'Cuba')
+                newEl.start = formatDate(start, "yyyy-MM-dd HH:mm")
+                newEl.end = formatDate(end, "yyyy-MM-dd HH:mm")
+                let tipoActividad = content.actividad?.tipo_actividad?.nombre;
+                let iconType = "undefined";
+                let title = `<i class="fa ${getIcon(iconType)}"></i> Undefined`
+                if (!!tipoActividad) {
+                    iconType = tipoActividad
+                    title = `<i class="fa ${getIcon(iconType)}"></i> ${tipoActividad}`
+                }
+                let clase = "pendiente"
+                if (content.solicitante !== this.userId && content.estado === "Aprobada") {
+                    clase = "aprobada_other_owner";
+                } else {
+                    clase = content.estado.toLowerCase()
+                }
+                newEl.id = content.id
+                newEl.title = title
+                newEl.content = content
+                newEl.class = clase
+                newEl.title_tooltip = content.actividad?.nombre
+                return newEl;
+            });
+            newReservations.sort((a, b) => {
+                let x = a.start
+                let y = b.start
+                return x < y ? -1 : x > y ? 1 : 0;
+            })
+            return newReservations;
         },
         userId() {
             return this.$auth.user.id;
@@ -231,8 +270,9 @@ export default {
             return []
         },
         tableContent() {
-            let newTableContent = this.reservaciones.map(el => {
+            let newTableContent = this.restReservations.map(el => {
                 let tableItem = {};
+                tableItem.id = el.id
                 tableItem.tipo = el.content.actividad?.tipo_actividad?.nombre
                 tableItem.actividad = el.content.actividad?.nombre
                 const dtime = el.start.split(' ')
@@ -264,11 +304,10 @@ export default {
         }
     },
     watch: {
-        reservaciones(newEl) {
-            this.events = newEl
-            // if (this.events.length > 0) {
-            //     this.selectDay = this.events[0].start.split(' ')[0]
-            // }
+        localesReservaciones(newEl, oldEl) {
+            if(newEl!== oldEl){
+                this.events = this.reservacionesAprobadas()
+            }
         },
     },
     data: () => ({
@@ -278,13 +317,13 @@ export default {
         filter: '',
         selecion: null,
         selections: [
-            { label: "Aprobadas", value: 'aprobada' },
             { label: "Pendientes", value: 'pendiente' },
             { label: "Canceladas", value: 'cancelada' }
         ],
         selectDay: formatDate(new Date(), "yyyy-MM-dd"),
         selectedEvent: null,
         setActividadCreada: {},
+        selectItem:null,
     }),
     methods: {
         hideNewEvent() {
@@ -292,24 +331,78 @@ export default {
         },
         refreshReservations() {
             const seleccionado = { ...this.localresponsableSelected };
+            console.log(seleccionado);
+            this.$store.dispatch('localresponsable/listado');
             this.localresponsableSelected = null;
             setTimeout(() => {
-                this.localresponsableSelected = seleccionado;
+                this.localresponsableSelected = this.locales.filter(el => el.id === seleccionado.id)[0];
+                console.log(this.localresponsableSelected);
             }, 50)
             this.hideNewEvent()
+            this.selectItem = null
         },
         enventClick(event, e) {
             this.$store.dispatch("reservacion/getItem", event.id)
             this.$store.dispatch("ui/setShowModalId", "cliente-reservacion-detail")
             e.stopPropagation()
         },
-        editShow() {
-            this.$store.dispatch("reservacion/getItem",)
-            this.$store.dispatch("ui/setShowModalId", "cliente-reservacion-edit")
-        },
         changeSelectDate(fecha) {
             console.log(fecha);
             this.$refs.vuecal.switchView('day', parseDate(fecha, "yyyy-MM-dd", new Date()));
+        },
+        changeSelectItem(item){
+            if(this.selectItem){
+                this.events = this.events.filter(el=> el.id !== this.selectItem.id)
+                const eventItem = this.restReservations.filter(el => el.id === item.id)[0]
+                console.log(eventItem)
+                this.selectItem = eventItem
+                this.events = [...this.events, eventItem];
+                const dtime = eventItem.start.split(' ')[0]
+                this.$refs.vuecal.switchView('week', parseDate(dtime, "yyyy-MM-dd", new Date()));
+            }
+            else{
+                const eventItem = this.restReservations.filter(el => el.id === item.id)[0]
+                console.log(eventItem)
+                this.selectItem = eventItem
+                this.events = [...this.events, eventItem];
+            }
+        },
+        reservacionesAprobadas(){
+            const allReservations = this.localesReservaciones;
+            const aproved = allReservations.filter(element => element.estado === "Aprobada")
+            let newReservations = aproved.map(el => {
+                let newEl = {}
+                const content = { ...el }
+                const start = utcToZonedTime(content.fecha_inicio, 'Cuba')
+                const end = utcToZonedTime(content.fecha_fin, 'Cuba')
+                newEl.start = formatDate(start, "yyyy-MM-dd HH:mm")
+                newEl.end = formatDate(end, "yyyy-MM-dd HH:mm")
+                let tipoActividad = content.actividad?.tipo_actividad?.nombre;
+                let iconType = "undefined";
+                let title = `<i class="fa ${getIcon(iconType)}"></i> Undefined`
+                if (!!tipoActividad) {
+                    iconType = tipoActividad
+                    title = `<i class="fa ${getIcon(iconType)}"></i> ${tipoActividad}`
+                }
+                let clase = "pendiente"
+                if (content.solicitante !== this.userId && content.estado === "Aprobada") {
+                    clase = "aprobada_other_owner";
+                } else {
+                    clase = content.estado.toLowerCase()
+                }
+                newEl.id = content.id
+                newEl.title = title
+                newEl.content = content
+                newEl.class = clase
+                newEl.title_tooltip = content.actividad?.nombre
+                return newEl;
+            });
+            newReservations.sort((a, b) => {
+                let x = a.start
+                let y = b.start
+                return x < y ? -1 : x > y ? 1 : 0;
+            })
+            return newReservations;
         },
     },
     mounted() {
