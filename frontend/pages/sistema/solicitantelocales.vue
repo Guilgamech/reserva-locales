@@ -41,15 +41,6 @@
                             <td class="text-end pe-4">
 
                                 <div class="d-flex justify-content-end">
-                                    <button v-tooltip="'Reservar en este local'" type="button"
-                                        class="md-button md-secondary md-just-icon">
-                                        <div class="md-ripple">
-                                            <div class="md-button-content">
-                                                <i class="fa-solid fa-scroll text-dark"></i>
-
-                                            </div>
-                                        </div>
-                                    </button>
                                     <button v-tooltip="'Detalles Local'" type="button" @click="showModalDetail(item.id)"
                                         class="md-button md-secondary md-just-icon">
                                         <div class="md-ripple">

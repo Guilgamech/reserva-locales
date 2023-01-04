@@ -107,23 +107,6 @@ export default {
                 return true;
             }
         },
-        local_detail_id() {
-            if (this.mediolocal.local === null) {
-                return '';
-            }
-            return '' + this.mediolocal.local.id;
-        },
-        local_hlg() {
-            if (this.$store.state.mediolocal.error.local.length > 0) {
-                return true;
-            }
-            else if (this.mediolocal.local === null) {
-                return false;
-            }
-            else {
-                return true;
-            }
-        },
         creando_mediolocal() {
             return this.$store.state.mediolocal.creando
         },
@@ -142,12 +125,6 @@ export default {
             }
             return this.$store.state.mediolocal.error.medio.join(", ");
         },
-        err_local() {
-            if (this.$store.state.mediolocal.error.local.length == 0) {
-                return '';
-            }
-            return this.$store.state.mediolocal.error.local.join(", ");
-        },
         err_non_field_errors() {
             if (this.$store.state.mediolocal.error.non_field_errors.length == 0) {
                 return '';
@@ -158,7 +135,6 @@ export default {
             if (
                 this.err_cantidad.length > 0
                 || this.err_medio.length > 0
-                || this.err_local.length > 0
                 || this.err_non_field_errors.length > 0
             ) {
                 return true;
@@ -168,16 +144,13 @@ export default {
         medio() {
             return this.$store.state.medio.listado;
         },
-        local() {
-            return this.$store.state.localresponsable.listado;
-        },
     },
     watch: {
         show(newValue) {
             if (newValue) {
                 this.$store.dispatch('mediolocal/unset_error');
                 this.$store.dispatch('medio/listado');
-                this.$store.dispatch('localresponsable/listado');
+                this.$store.dispatch('localresponsable/listado');   
             }
         },
         creando_mediolocal(newValue) {
@@ -233,12 +206,10 @@ export default {
             var vobj = {};
             var has_somting_wrong = false;
             for (const property in this.mediolocal) {
-                if (property == "local" || property == "medio") {
+                if (property == "medio") {
                     if (this.mediolocal[property] === null) {
                         has_somting_wrong = true;
-                        this.$store.dispatch('mediolocal/newError', { "local": ["Seleccione un Local"] });
                         this.$store.dispatch('mediolocal/newError', { "medio": ["Seleccione un Medio"] });
-
                     }
                     else {
                         vobj[property] = this.mediolocal[property]['id'];
@@ -248,6 +219,7 @@ export default {
                     vobj[property] = this.mediolocal[property]
                 }
             }
+            vobj.local = this.currentlocal.id
             if (!has_somting_wrong)
                 this.$store.dispatch('mediolocal/save', vobj);
             else {
@@ -268,7 +240,6 @@ export default {
         return {
             mediolocal: {
                 cantidad: NaN,
-                local: null,
                 medio: null
             },
             modal_tac: false,

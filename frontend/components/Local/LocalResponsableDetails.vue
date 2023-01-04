@@ -48,15 +48,6 @@
                                         <h6 class="col-2"><span class="text-sm text-secondary">{{ item.cantidad
                                         }}</span>
                                         </h6>
-                                        <button v-tooltip="'Editar medios de mi local'" type="button"
-                                            @click="showModalEdit({ local_id: '' + edit.id, medio_id: '' + item.medio.id })"
-                                            class="md-button md-edit md-just-icon col-2">
-                                            <div class="md-ripple">
-                                                <div class="md-button-content">
-                                                    <i class="fa-solid fa-wand-magic-sparkles"></i>
-                                                </div>
-                                            </div>
-                                        </button>
                                         <button v-tooltip="'Eliminar Medio de mi Local'" type="button"
                                             @click="todelete({ local_id: '' + edit.id, medio_id: '' + item.medio.id })"
                                             class="md-button md-danger md-just-icon col-2 ms-2">

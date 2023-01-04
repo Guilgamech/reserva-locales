@@ -2,34 +2,76 @@
     <div class="container-fluid">
         <div v-if="!!item" class="row">
             <div class="col-12">
-                <h6>Tipo de Actividad: <span class="text-sm text-secondary">{{ item.actividad.tipo_actividad.nombre }}</span></h6>
+                <h6>Tipo de Actividad: <span class="text-sm text-secondary">{{
+                    item.actividad.tipo_actividad.nombre
+                }}</span></h6>
                 <h6>Actividad: <span class="text-sm text-secondary">{{ item.actividad.nombre }}</span></h6>
-                <h6>Cantidad de Participantes: <span class="text-sm text-secondary">{{ item.cantidad_participantes }}</span></h6>
+                <h6>Cantidad de Participantes: <span class="text-sm text-secondary">{{
+                    item.cantidad_participantes
+                }}</span></h6>
                 <h6>Fecha: <span class="text-sm text-secondary">{{ fmDate(item.fecha_inicio) }}</span></h6>
-                <h6>Horario: <span class="text-sm text-secondary">{{ hDate(item.fecha_inicio) }} - {{ hDate(item.fecha_fin) }}</span></h6>
+                <h6>Horario: <span class="text-sm text-secondary">{{ hDate(item.fecha_inicio) }} - {{
+                    hDate(item.fecha_fin)
+                }}</span></h6>
                 <h6>Estado: <span class="text-sm text-secondary">{{ item.estado }}</span></h6>
                 <h6>Solicitante: <span class="text-sm text-secondary">{{ item.solicitante.email }}</span></h6>
-                <h6 v-if="item.estado === 'Cancelada'">Motivo Cancelación: <span class="text-sm text-secondary">{{ item.motivo }}</span></h6>
-                <h6 v-if="item.estado === 'Aprobada'">Aseguramientos: <span class="text-sm text-secondary">{{ item.aseguramientos }}</span></h6>
+                <h6 v-if="item.estado === 'Cancelada'">Motivo Cancelación: <span class="text-sm text-secondary">{{
+                    item.motivo
+                }}</span></h6>
+                <div class="row " v-if="item.estado === 'Aprobada'">
+                    <div class="row col-12 mb-3 ">
+                        <h6 class="col-12">Aseguramientos:
+                        </h6>
+                    </div>
+                    <div class="row col-12 mb-3" v-for=" (itemAseguramiento, index) in item.aseguramientos "
+                        :key="`ia-${index}`">
+                        <h6 class="col-6"><span class="text-sm text-secondary">{{
+                            itemAseguramiento.aseguramiento.nombre
+                        }}</span>
+                        </h6>
+                        <h6 class="col-3"><span class="text-sm text-secondary">{{ itemAseguramiento.cantidad }}</span>
+                        </h6>
+                    </div>
+                </div>
             </div>
             <div class="col-12 mt-2">
                 <div class="row">
-                    <div class="col-4">
+                    <div v-if="item.estado == 'Pendiente' && canChangeState" class="col-4">
                         <button type="button" @click="sendCancel" class="btn bg-gradient-danger w-100 my-4 mb-2">
                             <i class="fa-solid fa-cancel"></i>
                         </button>
                     </div>
-                    <div class="col-4">
+                    <div v-if="item.estado === 'Aprobada' && canChangeState" class="col-6">
+                        <button type="button" @click="sendCancel" class="btn bg-gradient-danger w-100 my-4 mb-2">
+                            <i class="fa-solid fa-cancel"></i>
+                        </button>
+                    </div>
+                    <div class="col-4" v-if="item.estado == 'Pendiente'">
                         <button type="button" @click="$emit('ocultar_detalles')"
-                            class="btn bg-gradient-dark w-100 my-4 mb-2">
+                            class="btn bg-gradient-dark w-100 my-4 mb-2 ">
                             <i class="fa-solid fa-close"></i>
                         </button>
                     </div>
-                    <div class="col-4">
-                        <button type="button" @click="sendAproved" class="btn bg-gradient-success w-100 my-4 mb-2">
+                    <div class="col-6" v-else>
+                        <button type="button" @click="$emit('ocultar_detalles')"
+                            class="btn bg-gradient-dark w-100 my-4 mb-2 ">
+                            <i class="fa-solid fa-close"></i>
+                        </button>
+                    </div>
+                    <div class="col-4" v-if="item.estado == 'Pendiente' && canChangeState">
+                        <button type="button" @click="sendAproved"
+                            class="btn bg-gradient-success w-100 my-4 mb-2">
                             <i class="fa-solid fa-check"></i>
                         </button>
                     </div>
+                    <div class="col-6" v-if="item.estado == 'Cancelada' && canChangeState">
+                        <button type="button" @click="sendAproved"
+                            class="btn bg-gradient-success w-100 my-4 mb-2">
+                            <i class="fa-solid fa-check"></i>
+                        </button>
+                    </div>
+                    
+
                 </div>
             </div>
         </div>
@@ -38,7 +80,7 @@
 </template>
 
 <script>
-import {format as formatDate, addDays, parse as parseDate, endOfDay, formatISO, addSeconds, subSeconds} from 'date-fns'
+import { format as formatDate, addDays, parse as parseDate, endOfDay, formatISO, addSeconds, subSeconds } from 'date-fns'
 import { utcToZonedTime } from "date-fns-tz";
 
 export default {
@@ -51,7 +93,19 @@ export default {
             }
             return null;
         },
+        canChangeState() {
+            const fecha = utcToZonedTime(this.item?.fecha_inicio, 'Cuba') > new Date()
+            const aprobada = this.item?.estado === "Aprobada"
+            if (aprobada) {
+                if (!fecha) {
+                    return false
+                }
+            }
+            return true
+
+        },
     },
+
     methods: {
         fmDate(date = new Date()) {
             const fecha = utcToZonedTime(date, 'Cuba')
@@ -69,7 +123,7 @@ export default {
                     element: "textarea",
                     attributes: {
                         placeholder: "Motivo por el cual se cancela",
-                        name:'motivo'
+                        name: 'motivo'
                     },
                 },
                 buttons: ["Salir", "Sí, Cancelala"],
@@ -77,8 +131,8 @@ export default {
             }).then(async (willCancel) => {
                 if (willCancel) {
                     const tarea = document.querySelector('textarea[name="motivo"]')
-                    const motivo = tarea? tarea.value : ''
-                    const data ={
+                    const motivo = tarea ? tarea.value : ''
+                    const data = {
                         estado: 'Cancelada',
                         cantidad_participantes: this.item.cantidad_participantes,
                         fecha_inicio: this.item.fecha_inicio,
@@ -89,7 +143,7 @@ export default {
                         solicitante: this.item.solicitante.id
                     }
                     await this.$axios.$put(`/reservacion/${this.item.id}/`, data)
-                        .then(()=>{
+                        .then(() => {
                             swal({
                                 title: "Correcto!!",
                                 text: "Cancelada Satisfactoriamente",
@@ -99,7 +153,7 @@ export default {
                                 this.$emit('reservacion-cancelada')
                             })
                         })
-                        .catch((error)=>{
+                        .catch((error) => {
                             console.log(error)
                             swal({
                                 title: "ERROR !!",
@@ -114,7 +168,7 @@ export default {
             });
         },
         async sendAproved() {
-            const data ={
+            const data = {
                 estado: 'Aprobada',
                 cantidad_participantes: this.item.cantidad_participantes,
                 fecha_inicio: this.item.fecha_inicio,
@@ -125,7 +179,7 @@ export default {
                 solicitante: this.item.solicitante.id
             }
             await this.$axios.$put(`/reservacion/${this.item.id}/`, data)
-                .then(()=>{
+                .then(() => {
                     swal({
                         title: "Correcto!!",
                         text: "Aprobada Satisfactoriamente",
@@ -135,8 +189,8 @@ export default {
                         this.$emit('reservacion-aprobada')
                     })
                 })
-                .catch((error)=>{
-                    if(error.status === 500){
+                .catch((error) => {
+                    if (error.status === 500) {
                         swal({
                             title: "ERROR !!",
                             text: "Revise la conexión con la Api",
@@ -144,7 +198,7 @@ export default {
                             button: "Continuar",
                         })
                     }
-                    else{
+                    else {
                         swal({
                             title: "ERROR !!",
                             text: "Ya existe una reservación en este horario",

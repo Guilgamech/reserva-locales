@@ -71,9 +71,6 @@
                                             </td>
                                             <td class="text-end pe-4">
                                                 <div class="d-flex justify-content-end">
-                                                    <a @click="changeSelectDate(item.fecha)"
-                                                        class="text-dark text-sm font-weight-bolder cursor-pointer"><i
-                                                            class="fa fa-file-invoice text-dark"></i></a>
                                                     <a @click="changeSelectItem(item)"
                                                         class="text-dark text-sm font-weight-bolder cursor-pointer"><i
                                                             class="fa fa-search text-dark ms-3"></i></a>
@@ -448,12 +445,12 @@ export default {
 }
 
 .vuecal__event.aprobada {
-    background-color: #c3fdb4;
+    background-color: #66BB6A ;
     color: #333;
 }
 
 .vuecal__event.aprobada_other_owner {
-    background-color: #344767;
+    background-color: #66BB6A ;
     color: white;
 }
 
@@ -472,7 +469,7 @@ export default {
 }
 
 tr.aprobada {
-    background-color: #c3fdb4;
+    background-color: #66BB6A ;
     border-radius: 5px;
 }
 
