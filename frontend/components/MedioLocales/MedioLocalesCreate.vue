@@ -18,22 +18,9 @@
                                 <div class="col-12">
                                     <fieldset class="mt-2 custom">
                                         <legend>
-                                            <div class="row">
-                                                <div class="col-6">
-                                                    Local
-                                                </div>
-                                            </div>
+                                            <h5>Local: {{ currentlocal? currentlocal.nombre : '' }}</h5>
                                         </legend>
-                                        <div class="row">
-                                            <div class="col-12">
-                                                <div class="form-control">
-                                                    <v-select v-model="mediolocal.local" @input="solved('local')"
-                                                        :class="{ 'hgl': local_hlg }" class="style-chooser"
-                                                        placeholder="Seleccionar" label="nombre" :options="local" />
-                                                    <div v-if="err_local.length > 0" class="error">{{ err_local }}</div>
-                                                </div>
-                                            </div>
-                                        </div>
+
                                     </fieldset>
                                 </div>
                                 <div class="col-12">
@@ -60,7 +47,7 @@
                                 <div class="col-12 mt-2">
                                     <number-inputoutline @error-solved="solved('cantidad')" :error="err_cantidad"
                                         label="Cantidad" type="text" v-model="mediolocal.cantidad" />
-                                        
+
                                 </div>
                             </div>
                             <div class="text-center mt-3">
@@ -95,6 +82,11 @@ export default {
         show: {
             type: Boolean,
             required: true,
+        },
+        currentlocal:{
+            type:Object,
+            required:false,
+            default: null
         }
     },
     computed: {

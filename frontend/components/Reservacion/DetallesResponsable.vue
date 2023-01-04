@@ -38,9 +38,8 @@
 </template>
 
 <script>
-import { format as formatDate } from "date-fns";
+import {format as formatDate, addDays, parse as parseDate, endOfDay, formatISO, addSeconds, subSeconds} from 'date-fns'
 import { utcToZonedTime } from "date-fns-tz";
-import { title } from "process";
 
 export default {
     name: "ReservacionDetallesResponsable",
@@ -52,50 +51,6 @@ export default {
             }
             return null;
         },
-        editado() {
-            return this.$store.state.reservacion.editado;
-        },
-    },
-    watch: {
-        cancelado(newValue) {
-            if (newValue) {
-                if (!newValue) {
-                    this.$store.dispatch('reservacion/setEditado', false);
-                    swal({
-                        title: "Correcto!!",
-                        text: "Cancelacion Satisfactoriamente",
-                        icon: "success",
-                        button: "Continuar",
-                    }).then(() => {
-                        this.$store.dispatch('local/listado');
-                        this.$emit('reservacion_cancelada')
-                    })
-                }
-                else {
-                    swal({
-                        title: "ERROR !!",
-                        text: "Revise su Conexión con la API",
-                        icon: "error",
-                        button: "Continuar",
-                    })
-                }
-
-            }
-        },
-        aprobado(newValue) {
-            if (newValue) {
-                this.$store.dispatch('reservacion/setEditado', false);
-                swal({
-                    title: "Correcto!!",
-                    text: "Aprobación Satisfactoriamente",
-                    icon: "success",
-                    button: "Continuar",
-                }).then(() => {
-                    this.$store.dispatch('local/listado');
-                    this.$emit('reservacion_aprobada')
-                })
-            }
-        },
     },
     methods: {
         fmDate(date = new Date()) {
@@ -106,29 +61,98 @@ export default {
             const fecha = utcToZonedTime(date, 'Cuba')
             return formatDate(fecha, "HH:mm");
         },
-        sendCancel(id) {
-            swal({
+        async sendCancel() {
+            await swal({
                 title: "Estas Seguro de Cancelarla",
                 icon: "error",
                 content: {
                     element: "textarea",
                     attributes: {
                         placeholder: "Motivo por el cual se cancela",
+                        name:'motivo'
                     },
                 },
                 buttons: ["Salir", "Sí, Cancelala"],
                 dangerMode: true
-            }).then((willCancel) => {
+            }).then(async (willCancel) => {
                 if (willCancel) {
-                    this.$store.dispatch('reservacion/update9852Item', this.item?.id);
+                    const tarea = document.querySelector('textarea[name="motivo"]')
+                    const motivo = tarea? tarea.value : ''
+                    const data ={
+                        estado: 'Cancelada',
+                        cantidad_participantes: this.item.cantidad_participantes,
+                        fecha_inicio: this.item.fecha_inicio,
+                        fecha_fin: this.item.fecha_fin,
+                        motivo,
+                        actividad: this.item.actividad.id,
+                        local: this.item.local.id,
+                        solicitante: this.item.solicitante.id
+                    }
+                    await this.$axios.$put(`/reservacion/${this.item.id}/`, data)
+                        .then(()=>{
+                            swal({
+                                title: "Correcto!!",
+                                text: "Cancelada Satisfactoriamente",
+                                icon: "success",
+                                button: "Continuar",
+                            }).then(() => {
+                                this.$emit('reservacion-cancelada')
+                            })
+                        })
+                        .catch((error)=>{
+                            console.log(error)
+                            swal({
+                                title: "ERROR !!",
+                                text: "Revise la conexión con la Api",
+                                icon: "error",
+                                button: "Continuar",
+                            })
+                        })
                 } else {
                     swal("Se ha Salido de la Acción de Cancelar")
                 }
             });
         },
-        sendAproved(id) {
-            this.$store.dispatch('reservacion/aprovedItem', this.item?.id)
-            console.log('send Aproved')
+        async sendAproved() {
+            const data ={
+                estado: 'Aprobada',
+                cantidad_participantes: this.item.cantidad_participantes,
+                fecha_inicio: this.item.fecha_inicio,
+                fecha_fin: this.item.fecha_fin,
+                motivo: this.item.motivo,
+                actividad: this.item.actividad.id,
+                local: this.item.local.id,
+                solicitante: this.item.solicitante.id
+            }
+            await this.$axios.$put(`/reservacion/${this.item.id}/`, data)
+                .then(()=>{
+                    swal({
+                        title: "Correcto!!",
+                        text: "Aprobada Satisfactoriamente",
+                        icon: "success",
+                        button: "Continuar",
+                    }).then(() => {
+                        this.$emit('reservacion-aprobada')
+                    })
+                })
+                .catch((error)=>{
+                    if(error.status === 500){
+                        swal({
+                            title: "ERROR !!",
+                            text: "Revise la conexión con la Api",
+                            icon: "error",
+                            button: "Continuar",
+                        })
+                    }
+                    else{
+                        swal({
+                            title: "ERROR !!",
+                            text: "Ya existe una reservación en este horario",
+                            icon: "error",
+                            button: "Continuar",
+                        })
+                    }
+                })
         },
     }
 }

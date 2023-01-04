@@ -34,7 +34,7 @@ class ReservacionAseguramientoReadSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ReservacionAseguramiento
-        fields = ('aseguramiento', 'cantidad')
+        fields = ('id', 'aseguramiento', 'cantidad')
 
 
 class ReservacionReadSerializer(serializers.ModelSerializer):
