@@ -5,6 +5,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework.response import Response
 from rest_framework.exceptions import ValidationError
 from apps.helper.helper import NestedViewSetMixin
+from apps.helper.messages import email_reserva, email_reserva_state
 from apps.reservacion.models import Reservacion, ReservacionAseguramiento
 from apps.reservacion.serializers import ReservacionSerializer, \
     ReservacionAseguramientoSerializer, ReservacionReadSerializer, Local, EditarAseguramientoSerializer, \
@@ -21,7 +22,9 @@ class ReservacionView(NestedViewSetMixin):
 
     def create(self, request, *args, **kwargs):
         print(request.data)
-        if request.data.get('solicitante') and request.data.get('local'):
+        solicitante = request.data.get('solicitante')
+        local = request.data.get('local')
+        if solicitante and local:
             reservaciones = list(Reservacion.objects.filter(
                 solicitante_id=request.data.get('solicitante'),
                 local_id=request.data.get('local')))
@@ -56,6 +59,7 @@ class ReservacionView(NestedViewSetMixin):
                 if len(found) > 0:
                     raise ValidationError(
                         {"fecha_inico": ["ya tiene una reservación en esa fecha"]})
+            email_reserva(solicitante, local)
         return super().create(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
@@ -73,8 +77,6 @@ class ReservacionView(NestedViewSetMixin):
             reservacion = self.get_object()
             reservaciones_aprobadas = list(
                 Reservacion.objects.filter(estado="Aprobada"))
-            print(reservaciones_aprobadas)
-            print(reservacion)
             if len(reservaciones_aprobadas) > 0:
                 newStart = reservacion.fecha_inicio + timedelta(seconds=1)
                 print(newStart)
@@ -97,6 +99,7 @@ class ReservacionView(NestedViewSetMixin):
                 if len(found) > 0:
                     raise ValidationError(
                         {"fecha_inico": ["ya tiene una reservación en esa fecha"]})
+            email_reserva_state(reservacion, user)
         return super().update(request, *args, **kwargs)
 
     @action(detail=False, methods=["get"])
@@ -128,6 +131,7 @@ class ReservacionView(NestedViewSetMixin):
 
     @action(detail=True, url_path='modificar-aseguramiento', methods=["put"],
             serializer_class=EditarAseguramientoSerializer)
+
     def actulizar_aseguramiento(self, request, pk=None, *args, **kwargs):
         sr = EditarAseguramientoSerializer(data=request.data)
         sr.is_valid(raise_exception=True)

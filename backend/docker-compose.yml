@@ -1,0 +1,85 @@
+version: "3.3"
+
+services:
+    db:
+        image: postgres
+        volumes:
+            - postgres_data:/var/lib/postgresql/data/
+        environment:
+            - POSTGRES_DB=${PGSQL_DATABASE}
+            - POSTGRES_USER=${PGSQL_USER}
+            - POSTGRES_PASSWORD=${PGSQL_PASSWORD}
+        container_name: server_db
+        ports:
+            - 5443:5432
+        command: postgres -c listen_addresses=*
+
+    app:
+        build:
+            context: ./
+            dockerfile: Dockerfile
+        restart: always
+        command: python manage.py runserver 0.0.0.0:8000
+        volumes:
+            - ./:/code
+        ports:
+            - 8000:8000
+        env_file:
+            - ./.env
+        depends_on:
+            - db
+        container_name: server_django_app
+
+    redis:
+        image: redis
+        ports:
+            - "6379:6379"
+        container_name: server_redis
+
+    celery_worker:
+        restart: always
+        build:
+            context: ./
+        command: celery -A server worker --loglevel=info --logfile=logs/celery.log
+        volumes:
+            - ./:/code
+        env_file:
+            - ./.env
+        depends_on:
+            - db
+            - redis
+            - app
+        container_name: server_celery_worker
+
+    celery-beat:
+        build:
+            context: ./
+            dockerfile: Dockerfile
+        command: celery -A server beat -l info
+        volumes:
+            - ./:/code
+        env_file:
+            - ./.env
+        depends_on:
+            - db
+            - redis
+            - app
+        container_name: server_celery_beat
+
+    flower:
+        build:
+            context: ./
+            dockerfile: Dockerfile
+        command: celery -A server flower  --broker=redis://host.docker.internal:6379//
+        ports:
+            - 5555:5555
+        env_file:
+            - ./.env
+        depends_on:
+            - db
+            - app
+            - redis
+            - celery_worker
+        container_name: server_flower
+volumes:
+    postgres_data:
