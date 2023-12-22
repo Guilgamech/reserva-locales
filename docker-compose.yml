@@ -101,19 +101,19 @@ services:
         ports:
             - 5555:5555
     
-    vue_app:
-        container_name: vue_app
-        build: 
-            context: ./frontend
-        volumes:
-            - ./frontend:/home/node/app/
-        command: tail -f /dev/null
-        ports:
-            - 3000:3000
-        expose:
-            - 3000
-        extra_hosts:
-            - "host.docker.internal:host-gateway"
+    # vue_app:
+    #     container_name: vue_app
+    #     build: 
+    #         context: ./frontend
+    #     volumes:
+    #         - ./frontend:/home/node/app/
+    #     command: npm run dev
+    #     ports:
+    #         - 3000:3000
+    #     expose:
+    #         - 3000
+    #     extra_hosts:
+    #         - "host.docker.internal:host-gateway"
 
 
 volumes:
