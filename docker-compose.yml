@@ -1,0 +1,121 @@
+services:
+    db:
+        container_name: db-reserva
+        image: postgres
+        restart: always
+        environment:
+            POSTGRES_PASSWORD: root
+            POSTGRES_USER: postgres
+            POSTGRES_DB: reservas_locales
+        volumes:
+            - db_reserva:/var/lib/postgresql/data
+        expose:
+            - 5432
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+
+    master:
+        container_name: master-reserva
+        image: redis:7
+        command: redis-server --port 6379
+        expose:
+            - 6379
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+
+    slave:
+        container_name: slave-reserva
+        image: redis:7
+        command: redis-server --port 6379 --slaveof master-reserva 6379
+        expose:
+            - 6379
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+
+    sentinel:
+        container_name: sentinel-reserva
+        build:
+            context: ./sentinel
+        command: redis-sentinel /etc/redis/sentinel.conf
+        volumes:
+            - ./sentinel:/etc/redis/
+        expose:
+            - 26379
+        depends_on:
+            - master
+            - slave
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+
+    web:
+        container_name: web-reserva
+        image: django-reserva
+        command: python manage.py runserver 0.0.0.0:8000
+        volumes:
+            - ./backend:/code
+        ports:
+            - 8000:8000
+        env_file:
+            - ./.env
+        depends_on:
+            - db   
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+    celery:
+        container_name: celery-reserva
+        image: django-reserva
+        env_file:
+            - ./.env
+        volumes:
+            - ./backend:/code
+        command: celery -A config worker --loglevel=info
+        depends_on:
+            - sentinel
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+    beat:
+        container_name: beat-reserva
+        image: django-reserva
+        env_file:
+            - ./.env
+        volumes:
+            - ./backend:/code
+        command: celery -A config beat -l info
+        depends_on:
+            - sentinel
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+    flower:
+        container_name: flower-reserva
+        image: django-reserva
+        env_file:
+            - ./.env
+        volumes:
+            - ./backend:/code
+        command: >
+            celery -A config flower --broker=sentinel://sentinel-reserva:26379/0 --broker_transport_options='{"master_name": "mymaster", "sentinels": [("sentinel-reserva", 26379)]}'
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+        depends_on:
+            - sentinel
+        ports:
+            - 5555:5555
+    
+    vue_app:
+        container_name: vue_app
+        build: 
+            context: ./frontend
+        volumes:
+            - ./frontend:/home/node/app/
+        command: tail -f /dev/null
+        ports:
+            - 3000:3000
+        expose:
+            - 3000
+        extra_hosts:
+            - "host.docker.internal:host-gateway"
+
+
+volumes:
+    db_reserva:
+    sentinel:

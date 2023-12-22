@@ -8,8 +8,10 @@ load_dotenv()
 BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.environ.get("SECRET_KEY")
 DEBUG = int(os.environ.get("DEBUG", default=0))
-PRODUCTION = int(os.environ.get("PRODUCTION", default=1))
-ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS").split(" ")
+PRODUCTION = DEBUG == 0
+ALLOWED_HOSTS = os.environ.get("DJANGO_ALLOWED_HOSTS", "::1 localhost 127.0.0.1").split()
+CORS_ALLOWED_ORIGINS=os.environ.get("CORS_ALLOWED_ORIGINS", "http://localhost:3000 http://localhost:5539 http://127.0.0.1:3000").split()
+
 DATABASES = {
     "default": {
         "ENGINE": os.environ.get("PGSQL_ENGINE", "django.db.backends.sqlite3"),
@@ -80,28 +82,26 @@ MAILQUEUE_QUEUE_UP = True
 MAILQUEUE_LIMIT = 1
 MAILQUEUE_STORAGE = True
 MAILQUEUE_ATTACHMENT_DIR = 'mailqueue-attachments'
-
-CELERY_BROKER_URL = os.environ.get("CELERY_BROKER", "redis://redis:6379")
-CELERY_RESULT_BACKEND = os.environ.get("CELERY_BACKEND", "redis://redis:6379")
-if CELERY_RESULT_BACKEND == "django-db":
-    INSTALLED_APPS += [
-        "django_celery_results",
-    ]
+CELERY_BROKER_URL = os.environ.get("CELERY_BROKER_URL", 'sentinel://sentinel-reserva:26379/0')
+CELERY_BROKER_TRANSPORT_OPTIONS = {
+    'master_name': os.environ.get("CELERY_MASTER_NAME", 'mymaster'),
+    'sentinels': [(os.environ.get("CELERY_SENTINEL_NAME", 'sentinel-reserva'), int(os.environ.get("CELERY_SENTINEL_PORT", 26379)))],
+}
+CELERY_RESULT_BACKEND = os.environ.get("CELERY_BROKER_URL", 'sentinel://sentinel-reserva:26379/0')
+CELERY_RESULT_BACKEND_TRANSPORT_OPTIONS = {
+    'master_name': os.environ.get("CELERY_MASTER_NAME", 'mymaster'),
+    'sentinels': [(os.environ.get("CELERY_SENTINEL_NAME", 'sentinel-reserva'), int(os.environ.get("CELERY_SENTINEL_PORT", 26379)))],
+}
 CELERY_ACCEPT_CONTENT = ["application/json"]
 CELERY_RESULT_SERIALIZER = "json"
 CELERY_TASK_SERIALIZER = "json"
-CELERY_TIMEZONE = "UTC"
+CELERY_TIMEZONE = 'Cuba'
 CELERY_BEAT_SCHEDULER = "django_celery_beat.schedulers:DatabaseScheduler"
-
-CELERY_IMPORTS = [
-    'apps.task',
-]
 
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [BASE_DIR / 'templates']
-        ,
+        'DIRS': [BASE_DIR / 'templates'],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -128,7 +128,6 @@ AD_DNS_NAME = 'reduc.edu.cu'
 AD_LDAP_PORT = 389
 
 # LDAP Authentication Configuration
-
 
 # The URL of the LDAP server.
 LDAP_AUTH_URL = 'ldap://%s:%s' % (AD_DNS_NAME, AD_LDAP_PORT)
@@ -201,9 +200,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/3.2/howto/static-files/
 
 STATIC_URL = '/static/'
-
 STATIC_ROOT = os.path.join(BASE_DIR, 'static')
-
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 

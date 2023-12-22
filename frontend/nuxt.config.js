@@ -97,5 +97,8 @@ export default {
         implementation: require('sass'),
       },
     },
-  }
+  },
+  server: {
+    host: '0.0.0.0',
+  },
 }
