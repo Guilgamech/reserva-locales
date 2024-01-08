@@ -98,7 +98,7 @@
             </div>
         </div>
         <Modal modal-id="cliente-reservacion-create" size="sm" title="Nueva Reservación">
-            <reservacion-form v-if="modalOpen === 'cliente-reservacion-create'" :reservaciones="reservaciones"
+            <RForm v-if="modalOpen === 'cliente-reservacion-create'" :reservaciones="reservaciones"
                               :local="localSelected" :start="selectedEvent" :newActividad="setActividadCreada"
                               @reservacion_cancelada="hideNewEvent" @reservacion_creada="refreshReservations"/>
         </Modal>
@@ -115,6 +115,7 @@
 </template>
 <script>
 import {PerfectScrollbar} from "vue2-perfect-scrollbar";
+import RForm from "../../components/Reservacion/RForm";
 import Modal from "@/components/Modal/Modal";
 import MenuPosition from "@/components/Menu/MenuPosition";
 import {VClosePopover, VPopover, VTooltip} from "v-tooltip";
@@ -168,7 +169,8 @@ export default {
         PerfectScrollbar,
         Detalles,
         ActividadCreate,
-        AseguramientoReservacionCreate
+        AseguramientoReservacionCreate,
+        RForm
     },
     name: "Reservacion",
     middleware: ["login"],
