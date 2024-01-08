@@ -12,4 +12,5 @@ RUN pip install -r /opt/requirements.txt
 RUN pip install django-mail-queue
 RUN pip install django-rest-framework-nested==0.0.1
 RUN pip install phonenumbers
+RUN pip install django-python3-ldap
 WORKDIR /code
