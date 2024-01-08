@@ -2,7 +2,7 @@ from django.conf import settings
 from mailqueue.models import MailerMessage
 
 
-def email_reserva(usuario, local):
+def email_reserva(usuario, local):    
     subject = 'Un Usuario A Reservado Su Local'
     message = f'El {usuario.username}, a reservado su local.'
     email_from = settings.EMAIL_HOST_USER

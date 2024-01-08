@@ -12,6 +12,8 @@ from apps.reservacion.serializers import ReservacionSerializer, \
     EliminarAseguramientoSerializer
 from apps.helper.functions import checkDateInRange
 from datetime import timedelta, datetime
+from apps.user.models import User
+from apps.local.models import Local
 
 
 class ReservacionView(NestedViewSetMixin):
@@ -59,7 +61,10 @@ class ReservacionView(NestedViewSetMixin):
                 if len(found) > 0:
                     raise ValidationError(
                         {"fecha_inico": ["ya tiene una reservación en esa fecha"]})
-            email_reserva(solicitante, local)
+            solicitante_obj = User.objects.filter(pk=solicitante).first()
+            local_obj = Local.objects.filter(pk=local).first()
+            if solicitante_obj and local_obj:
+                email_reserva(solicitante_obj, local_obj)
         return super().create(request, *args, **kwargs)
 
     def update(self, request, *args, **kwargs):
